@@ -50,13 +50,16 @@
     Streams <em>performance</em> is underwhelming
   </div>
   <div>
+    "If you think streams are a problem in Node.js.... they are." - @matteocollina
+  </div>
+  <div>
     2. <em>Goals</em>
   </div>
   <div>
     Some terms:
     <ul>
-      <li><em>Consumer</em> / "<em>Sink</em>" - API end where data goes to.</li><br>
-      <li><em>Producer</em> / "<em>Source</em>" - API end where data comes from.</li><br>
+      <li><em>Consumer</em> / "<em>Sink</em>" - API where data goes to.</li><br>
+      <li><em>Producer</em> / "<em>Source</em>" - API where data comes from.</li><br>
       <li><em>"Protocol"</em> - combination of a Consumer & Producer</li>
     </ul>
   </div>
@@ -189,15 +192,16 @@ class PassThrough {
     </code></pre>
   </div>
   <div>
-    <li>Composing a <em>source & sink</em></li>
+    <li>Composing a <em>Stream</em></li>
     <br>
     <pre><code class="js">
-const source = new Source(opts)
-const sink = new Sink(opts)
+const { Stream } = require('bob-streams')
 
+const source = new Source(/* args */)
+const sink = new Sink(/* args */)
 
-
-sink.bindSource(source, error => {
+const stream = new Stream(source, sink)
+stream.start(error => {
   // The stream is finished when this is called.
 })
     </code></pre>
@@ -206,12 +210,14 @@ sink.bindSource(source, error => {
     <li>Composition with a <em>transform</em></li>
     <br>
     <pre><code class="js">
-const source = new Source(opts)
-const sink = new Sink(opts)
-const transform = new Transform(opts)
+const { Stream } = require('bob-streams')
 
-transform.bindSource(source)
-sink.bindSource(transform, error => {
+const source = new Source(/* args */)
+const xform = new Transform(/* args */)
+const sink = new Sink(/* args */)
+
+const stream = new Stream(source, xform, sink)
+stream.start(error => {
   // The stream is finished when this is called.
 })
     </code></pre>
@@ -239,34 +245,32 @@ sink.bindSource(transform, error => {
       <li>fs-source</li>
       <li>fs-sink</li>
       <li>zlib-transform</li>
+      <li>crc-transform</li>
       <li>github.com/Fishrock123/socket</li>
     </ul>
   </div>
   <div>
-    Current API <em>Performance</em>
+    Current <em>Helpers</em>
     <br>
-    <small>For any single stream</small>
     <ul>
-      <li>~30% decrease of CPU time in bad cases</li>
-      <li><em>Up to 8x decrease</em> in good cases</li>
-      <li>Should correlate to overall throughput but may not be exact.</li>
+      <li>Stream(source, ...sinks)</li>
+      <li>WritableSource() extends Readable</li>
+      <li>ReadableSink() extends Writable</li>
+      <li>BufferSource(buffers)</li>
+      <li>AssertionSource(assertions)</li>
+      <li>AssertionSink(assertions)</li>
     </ul>
+  </div>
+  <div>
+    Current Status is <em>Stalled</em>
+    <br>
+    ... and possibly <em>Defunct</em>...
   </div>
   <div>
     Discussion!
     <br>
     <br>
     github.com/<em>Fishrock123/bob</em>
-  </div>
-  <div>
-    Open <em>Questions</em>
-    <br><br>
-    <li>Is this API likeable?</li>
-    <li>Do we need a buffer pooling helper?</li>
-    <li>Is it too API-pattern focused?</li>
-    <li>How to enforce single active request?</li>
-    <li>Where to start implementing in core?</li>
-    <li>Libuv pull streams?</li>
   </div>
 </body>
 </html>
