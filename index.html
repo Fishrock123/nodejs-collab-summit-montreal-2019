@@ -5,12 +5,32 @@
   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
   <title>Big</title>
   <link href='big.css' rel='stylesheet' type='text/css' />
-  <link href='highlight.css' rel='stylesheet' type='text/css' />
+  <link href='styles/vs2015.css' rel='stylesheet' type='text/css' />
   <style>
     .new-shiny { background: #aaaaaa; }
     :-webkit-full-screen {
       width: 100%;
       height: 100%;
+    }
+    .light {
+      background: #f8f8f8;
+      color: #4C5859;
+    }
+
+    .light em {
+      color: #26CC8F;
+    }
+
+    .light a {
+      color: #05A8AA;
+    }
+
+    .light a:hover {
+      color: #058A8C;
+    }
+
+    code {
+      padding: 20px 100px 30px 50px !important;
     }
   </style>
   <script src='big.js'></script>
@@ -31,8 +51,8 @@
   </script>
 </head>
 <body id='body' class='light'>
-  <div>Node Collab Summit Berlin 2019</div>
-  <div><em>BOB</em> (Future? Streams)</div>
+  <div><center>Collab&nbsp;Summit Montréal 2019</center></div>
+  <div><center><em>BOB</em> (Future?&nbsp;Streams)</center></div>
   <div>
     1. <em>Why</em><br>
     2. <em>Goals</em><br>
@@ -41,7 +61,10 @@
     6. <em>Discussion</em>
   </div>
   <div>
-    1. <em>Why</em> reinvent streams?
+    <center>1. <em>Why</em></center>
+  </div>
+  <div>
+    <center>1. <em>Why</em> reinvent streams?</center>
   </div>
   <div>
     The Streams <em>user experiance</em> is bad
@@ -50,7 +73,7 @@
     Streams <em>performance</em> is underwhelming
   </div>
   <div>
-    "If you think streams are a problem in Node.js.... they are." - @matteocollina
+    "If you think streams are a problem in Node.js.... they are." - <a>@matteocollina</a>
   </div>
   <div>
     2. <em>Goals</em>
@@ -71,15 +94,15 @@
     </ul>
   </div> -->
   <div>
-    Protocol <em>Goals</em>
+    <em>Protocol</em> Goals
     <ul>
       <li>Pull-based</li>
       <li>Binary-only</li>
       <li>Stateless (in-protocol)</li>
       <li>One-to-one (no events)</li>
-      <li>Timing agnostic</li>
+      <li>Timing agnostic (sync or async)</li>
       <li>No buffering (in-protocol)</li>
-      <li>In-line errors and "end"</li>
+      <li>In-line control flow (errors and "end")</li>
     </ul>
   </div>
   <!-- <div>
@@ -90,11 +113,10 @@
     </ul>
   </div> -->
   <div>
-    The <em>Current Proposed API</em>
+    The&nbsp;Current&nbsp;Proposed&nbsp;API
   </div>
   <div>
-    <li><em>Sink API</em></li>
-    <br>
+    Sink API
     <pre><code class="js">
 class Sink {
   constructor (opts) {}
@@ -109,11 +131,10 @@ class Sink {
 
   }
 }
-    </code></pre>
+</code></pre>
   </div>
   <div>
-    <li><em>Sink API</em></li>
-    <br>
+    Sink API
     <pre><code class="js">
 class Sink {
   constructor (opts) {}
@@ -128,11 +149,10 @@ class Sink {
     this.source.pull(null, buffer)
   }
 }
-    </code></pre>
+</code></pre>
   </div>
   <div>
-    <li><em>Source API</em></li>
-    <br>
+    Source API
     <pre><code class="js">
 class Source {
   constructor (opts) {}
@@ -147,11 +167,10 @@ class Source {
 
   }
 }
-    </code></pre>
+</code></pre>
   </div>
   <div>
-    <li><em>Source API</em></li>
-    <br>
+    Source API
     <pre><code class="js">
 class Source {
   constructor (opts) {}
@@ -166,7 +185,7 @@ class Source {
                    buffer, bytesWritten)
   }
 }
-    </code></pre>
+</code></pre>
   </div>
   <div>
     <pre><code class="js">
@@ -189,11 +208,10 @@ class PassThrough {
     this.source.pull(error, buffer)
   }
 }
-    </code></pre>
+</code></pre>
   </div>
   <div>
-    <li>Composing a <em>Stream</em></li>
-    <br>
+    <em>Composing</em> a Stream
     <pre><code class="js">
 const { Stream } = require('bob-streams')
 
@@ -207,8 +225,7 @@ stream.start(error => {
     </code></pre>
   </div>
   <div>
-    <li>Composition with a <em>transform</em></li>
-    <br>
+    Composition with a transform
     <pre><code class="js">
 const { Stream } = require('bob-streams')
 
@@ -223,7 +240,7 @@ stream.start(error => {
     </code></pre>
   </div>
   <div>
-    github.com/<em>Fishrock123/bob</em>
+    github.com/<a href="https://github.com/Fishrock123/bob">Fishrock123/bob</a>
     <br>
     <br>
     <small>/diagrams</small>
@@ -235,7 +252,7 @@ stream.start(error => {
     <img src="diagrams/BOB-errors-diagram.png" />
   </div>
   <div>
-    Current <em>Status</em>
+    <center>Current&nbsp;<em>Status</em></center>
   </div>
   <div>
     Current <em>Modules</em>
@@ -252,25 +269,42 @@ stream.start(error => {
   <div>
     Current <em>Helpers</em>
     <br>
-    <ul>
-      <li>Stream(source, ...sinks)</li>
-      <li>WritableSource() extends Readable</li>
-      <li>ReadableSink() extends Writable</li>
-      <li>BufferSource(buffers)</li>
-      <li>AssertionSource(assertions)</li>
-      <li>AssertionSink(assertions)</li>
-    </ul>
+    <pre><code class="js">
+Stream(source, ...sinks)
+
+WritableSource() extends Readable
+ReadableSink() extends Writable
+
+BufferSource(buffers)
+
+AssertionSource(assertions)
+AssertionSink(assertions)
+    </code></pre>
   </div>
   <div>
-    Current Status is <em>Stalled</em>
+    Current&nbsp;Status&nbsp;is...&nbsp;<em>stalled</em>
     <br>
-    ... and possibly <em>Defunct</em>...
+    ...&nbsp;and&nbsp;possibly&nbsp;<em>(not?)&nbsp;defunct</em>...
   </div>
   <div>
     Discussion!
     <br>
     <br>
-    github.com/<em>Fishrock123/bob</em>
+    github.com/<a href="https://github.com/Fishrock123/bob">Fishrock123/bob</a>
+  </div>
+  <div>
+    Problem&nbsp;Solving
+    <br>
+    Groups of 3-5
+  </div>
+  <div>
+    How to enforce the API (presently only convention)?
+  </div>
+  <div>
+    Use-cases that are better served via <em><code>writev</code></em> aside from theoretical performance?
+  </div>
+  <div>
+    An API for neatly giving buffer allocation hints (i.e. source to sink)?
   </div>
 </body>
 </html>
