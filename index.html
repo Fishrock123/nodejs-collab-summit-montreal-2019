@@ -51,20 +51,18 @@
   </script>
 </head>
 <body id='body' class='light'>
-  <div><center>Collab&nbsp;Summit Montréal 2019</center></div>
+  <div><center>Collab&nbsp;Summit <em>Montréal 2019</em></center></div>
   <div><center><em>BOB</em> (Future?&nbsp;Streams)</center></div>
   <div>
     1. <em>Why</em><br>
     2. <em>Goals</em><br>
-    3. <em>Api</em><br>
+    3. <em>API</em><br>
     4. <em>Current Status</em><br>
-    6. <em>Discussion</em>
+    5. <em>Problem Solving?</em>
   </div>
   <div>
     <center>1. <em>Why</em></center>
-  </div>
-  <div>
-    <center>1. <em>Why</em> reinvent streams?</center>
+    <notes>Why reinvent streams</notes>
   </div>
   <div>
     The Streams <em>user experiance</em> is bad
@@ -73,36 +71,28 @@
     Streams <em>performance</em> is underwhelming
   </div>
   <div>
-    "If you think streams are a problem in Node.js.... they are." - <a>@matteocollina</a>
+    <em>"</em>If you think streams are a problem in Node.js.... they are.<em>"</em> - <a>@matteocollina</a>
   </div>
   <div>
     2. <em>Goals</em>
   </div>
   <div>
-    Some terms:
-    <ul>
-      <li><em>Consumer</em> / "<em>Sink</em>" - API where data goes to.</li><br>
-      <li><em>Producer</em> / "<em>Source</em>" - API where data comes from.</li><br>
-      <li><em>"Protocol"</em> - combination of a Consumer & Producer</li>
-    </ul>
-  </div>
-  <!-- <div>
     <ul>
       <li><em>Performance</em> and <em>ease-of-use</em> are key.</li>
       <li>Implementable in a performant and usable way for both <em>JS and C++</em>.</li>
       <li>Browser portability is preferable.</li>
     </ul>
-  </div> -->
+  </div>
   <div>
     <em>Protocol</em> Goals
     <ul>
-      <li>Pull-based</li>
-      <li>Binary-only</li>
-      <li>Stateless (in-protocol)</li>
-      <li>One-to-one (no events)</li>
-      <li>Timing agnostic (sync or async)</li>
-      <li>No buffering (in-protocol)</li>
-      <li>In-line control flow (errors and "end")</li>
+      <li>Pull-based <em>(backpressure)</em></li>
+      <li>Binary-only <em>(simplicity)</em></li>
+      <li>Stateless <em>(in-protocol)</em></li>
+      <li>One-to-one <em>(no events)</em></li>
+      <li>Timing agnostic <em>(sync or async)</em></li>
+      <li>No buffering <em>(in-protocol)</em></li>
+      <li>In-line control flow <em>(errors and "end")</em></li>
     </ul>
   </div>
   <!-- <div>
@@ -116,6 +106,15 @@
     The&nbsp;Current&nbsp;Proposed&nbsp;API
   </div>
   <div>
+    Some terms:
+    <ul>
+      <li><em>Consumer</em> / "<em>Sink</em>" - API where data goes to.</li><br>
+      <li><em>Producer</em> / "<em>Source</em>" - API where data comes from.</li><br>
+      <li><em>"Protocol"</em> - combination of a Consumer & Producer</li>
+    </ul>
+    <notes>Keep in mind that BOB is a protocol specification, not an inheritable api</notes>
+  </div>
+  <!-- <div>
     Sink API
     <pre><code class="js">
 class Sink {
@@ -132,7 +131,7 @@ class Sink {
   }
 }
 </code></pre>
-  </div>
+  </div> -->
   <div>
     Sink API
     <pre><code class="js">
@@ -142,6 +141,7 @@ class Sink {
   bindSource (source, bindCb) {
     this.source = source
     this.source.bindSink(this)
+    return this
   }
 
   next (status, error, buffer, bytes) {
@@ -151,7 +151,7 @@ class Sink {
 }
 </code></pre>
   </div>
-  <div>
+  <!-- <div>
     Source API
     <pre><code class="js">
 class Source {
@@ -168,7 +168,7 @@ class Source {
   }
 }
 </code></pre>
-  </div>
+  </div> -->
   <div>
     Source API
     <pre><code class="js">
@@ -225,7 +225,21 @@ stream.start(error => {
     </code></pre>
   </div>
   <div>
-    Composition with a transform
+    <em>Composing</em> a Stream
+    <pre><code class="js">
+const { Stream } = require('bob-streams')
+
+const source = new Source(/* args */)
+const sink = new Sink(/* args */)
+
+const stream = new Stream(source, sink)
+await util.promisify(stream.start.bind(stream))()
+// The stream is finished when the await completes
+
+    </code></pre>
+  </div>
+  <div>
+    <em>Composition</em> with a transform
     <pre><code class="js">
 const { Stream } = require('bob-streams')
 
@@ -234,6 +248,27 @@ const xform = new Transform(/* args */)
 const sink = new Sink(/* args */)
 
 const stream = new Stream(source, xform, sink)
+stream.start(error => {
+  // The stream is finished when this is called.
+})
+    </code></pre>
+  </div>
+  <div>
+    API <em>Verification</em>
+    <pre><code class="js">
+const { Stream, Verify } = require('bob-streams')
+
+const source = new Source(/* args */)
+const xform = new Transform(/* args */)
+const sink = new Sink(/* args */)
+
+const stream = new Stream(
+  source,
+  new Verify(), // Checks protocol between source and xform
+  xform,
+  new Verify(), // Checks protocol between xform and sink
+  sink
+)
 stream.start(error => {
   // The stream is finished when this is called.
 })
@@ -258,7 +293,7 @@ stream.start(error => {
     Current <em>Modules</em>
     <br>
     <ul>
-      <li>bob-status</li>
+      <li>bob-streams</li>
       <li>fs-source</li>
       <li>fs-sink</li>
       <li>zlib-transform</li>
@@ -284,6 +319,7 @@ AssertionSink(assertions)
   <div>
     Current&nbsp;Status&nbsp;is...&nbsp;<em>stalled</em>
     <br>
+    <br>
     ...&nbsp;and&nbsp;possibly&nbsp;<em>(not?)&nbsp;defunct</em>...
   </div>
   <div>
@@ -295,16 +331,33 @@ AssertionSink(assertions)
   <div>
     Problem&nbsp;Solving
     <br>
+    <br>
     Groups of 3-5
   </div>
   <div>
-    How to enforce the API (presently only convention)?
+    <a href="https://github.com/openjs-foundation/summit/issues/196">openjs-foundation/summit/issues/196</a>
+    <ul>
+      <li>API Enforcement</li>
+      <li>Content-addressibility</li>
+      <li>"writev"</li>
+      <li>Buffer allocation hints</li>
+    </ul>
   </div>
   <div>
-    Use-cases that are better served via <em><code>writev</code></em> aside from theoretical performance?
+    How to <em>enforce</em> the <em>API</em>?
+    <notes>(Currently only convention backed by `Verify()`)</notes>
   </div>
   <div>
-    An API for neatly giving buffer allocation hints (i.e. source to sink)?
+    Is <em>content-addressibility</em> desirable / worthwhile?
+    <notes>(As in specifying a binary index?)</notes>
+  </div>
+  <div>
+    Use-cases that are better served via <em><code>writev</code></em>?
+    <notes>(Aside from theoretical performance?)</notes>
+  </div>
+  <div>
+    An API for neatly giving <em>buffer allocation hints</em>?
+    <notes>(i.e. source to sink?)</notes>
   </div>
 </body>
 </html>
